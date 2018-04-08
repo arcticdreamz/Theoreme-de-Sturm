@@ -70,17 +70,37 @@ this method returns the list where each element of ls is multiplied by (p1/q1)
                       (cons (* n (car p))
                             (deriv (+ n 1) (cdr p))))))
 
-
-(define eval (lambda (x p)
-               (if (null? p) '()
-                   (cons (eval-aux x (car p) 0) (eval x (cdr p))))
+; Evaluates the sturm-chain sturm at a given value x and returns a list
+; containing the result of each polynome
+(define eval-sturm (lambda (x sturm)
+               (if (null? sturm) '()
+                   (cons (eval-poly x (car sturm) 0) (eval-sturm x (cdr sturm))))
                ))
 
-(define eval-aux (lambda (x p n)
+; Evaluates the polynome p using the value x
+(define eval-poly (lambda (x p n)
                    (if (null? p) 0
                        (+ (* (car p) (expt x n))
-                             (eval-aux x (cdr p) (+ n 1))
+                             (eval-poly x (cdr p) (+ n 1))
                              ))))
+
+;If p is a list of numbers, this function returns the number of sign changes from one number to the other
+(define signs (lambda (p)
+                (if (null? (cdr p)) 0
+                (if (or (and (> (car p) 0)
+                             (< (cadr p) 0))
+                        (and (< (car p) 0)
+                             (> (cadr p) 0))
+                        )
+                    (+ 1 (signs (cdr p)))
+                    (+ 0 (signs (cdr p)))))))
+                    
+                        
+                        
+                    
+                             
+                        
+                     
                
           
                
@@ -88,15 +108,20 @@ this method returns the list where each element of ls is multiplied by (p1/q1)
 ; if p is a polynome and both a and b are numbers such that a < b,
 ; (count-roots p a b) returns the number of roots of p
 ; on ]a b]
-(define count-roots
-  (lambda (p a b) "TODO"))
+(define count-roots (lambda (p a b)
+                      (let ([sturm (sturm-chain pol)])
+                        (let ([sign_a (signs (eval-sturm a sturm))])
+                          (let ([sign_b (signs (eval-sturm b sturm))])
+                            (- sign_a sign_b)
+                         )))))
+                      
  
 
 ; if p is a polynome, both a and b are numbers (such that a < b) and eps
 ; is a positive real, (find-roots p a b eps) returns the ordered list
 ; of roots of p on the ]a, b] interval with precision eps
-(define find-roots
-  (lambda (p a b eps) "POSSIBLY TODO"))
+(define find-roots ( lambda (p a b eps)
+                      
 
 
 
@@ -104,4 +129,6 @@ this method returns the list where each element of ls is multiplied by (p1/q1)
 'pol pol
 (define sturm (sturm-chain pol))
 'sturm sturm
-'eval (eval 5 sturm)
+(define eval (eval-sturm 5 sturm))
+'eval eval
+(count-roots eval -5 5)
