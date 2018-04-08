@@ -109,7 +109,7 @@ this method returns the list where each element of ls is multiplied by (p1/q1)
 ; (count-roots p a b) returns the number of roots of p
 ; on ]a b]
 (define count-roots (lambda (p a b)
-                      (let ([sturm (sturm-chain pol)])
+                      (let ([sturm (sturm-chain p)])
                         (let ([sign_a (signs (eval-sturm a sturm))])
                           (let ([sign_b (signs (eval-sturm b sturm))])
                             (- sign_a sign_b)
@@ -120,11 +120,22 @@ this method returns the list where each element of ls is multiplied by (p1/q1)
 ; if p is a polynome, both a and b are numbers (such that a < b) and eps
 ; is a positive real, (find-roots p a b eps) returns the ordered list
 ; of roots of p on the ]a, b] interval with precision eps
-(define find-roots ( lambda (p a b eps)
+(define find-roots (lambda (p a b eps)
+                     (if (<= (- b a) eps) a
+                         (let ([m (/ (+ a b) 2)])
+                            (if (<= (* (eval-poly a p 0) (eval-poly m p 0)) 0)
+                               (find-roots p a m eps)
+                               (find-roots p m b eps))))))
+                          
+                     
+                        
+                            
+                        
+                      
                       
 
 
-
+#|
 (define pol '(1 2 3))
 'pol pol
 (define sturm (sturm-chain pol))
@@ -132,3 +143,6 @@ this method returns the list where each element of ls is multiplied by (p1/q1)
 (define eval (eval-sturm 5 sturm))
 'eval eval
 (count-roots eval -5 5)
+|#
+
+(find-roots '(1 2 1) -2 2 0.0001)
