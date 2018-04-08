@@ -16,9 +16,8 @@
 ; of P(x) by Q(x).
 (define p%q (lambda(p q)
               (if (< (length p) (length q)) p 
-                  (let ([p (reverse p)] [q (reverse q)])
-                    (let ([subls (sublist p q)]) ;Get the sublist
-                      (p%q_aux (substract_lists p subls) q )))))) ;Substract each coefficient of p by those of subls
+                  (let* ([p (reverse p)] [q (reverse q)] [subls (sublist p q)] ) ;Get the sublist
+                      (p%q_aux (substract_lists p subls) q ))))) ;Substract each coefficient of p by those of subls
 
 
 (define p%q_aux (lambda(p q)
@@ -55,12 +54,11 @@ this method returns the list where each element of ls is multiplied by (p1/q1)
                       (cons p (cons (cdr (deriv 0 p)) (sturm-chain-aux p)))))
 
 (define sturm-chain-aux (lambda (p)
-                        (let ([dp (cdr (deriv 0 p))])
-                          (let ([p_i (p%q p dp)])
+                        (let* ([dp (cdr (deriv 0 p))] [p_i (p%q p dp)])
                             (if (or (null? p_i)
                                     (zero? (car p_i)))
                                 '()
-                                (cons p_i (sturm-chain-aux dp)))))))
+                                (cons p_i (sturm-chain-aux dp))))))
                           
                              
 
@@ -109,11 +107,11 @@ this method returns the list where each element of ls is multiplied by (p1/q1)
 ; (count-roots p a b) returns the number of roots of p
 ; on ]a b]
 (define count-roots (lambda (p a b)
-                      (let ([sturm (sturm-chain p)])
-                        (let ([sign_a (signs (eval-sturm a sturm))])
-                          (let ([sign_b (signs (eval-sturm b sturm))])
+                      (let* ([sturm (sturm-chain p)]
+                             [sign_a (signs (eval-sturm a sturm))]
+                             [sign_b (signs (eval-sturm b sturm))])
                             (- sign_a sign_b)
-                         )))))
+                         )))
                       
  
 
@@ -135,7 +133,7 @@ this method returns the list where each element of ls is multiplied by (p1/q1)
                       
 
 
-#|
+
 (define pol '(1 2 3))
 'pol pol
 (define sturm (sturm-chain pol))
@@ -143,6 +141,6 @@ this method returns the list where each element of ls is multiplied by (p1/q1)
 (define eval (eval-sturm 5 sturm))
 'eval eval
 (count-roots eval -5 5)
-|#
 
-(find-roots '(1 2 1) -2 2 0.0001)
+
+;;(find-roots '(1 2 1) -2 2 0.0001)
